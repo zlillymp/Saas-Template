@@ -42,7 +42,19 @@ const Auth = () => {
       }
     );
 
-    return () => subscription.unsubscribe();
+    // Listen for auth errors from Supabase Auth UI
+    const handleAuthError = (event: CustomEvent) => {
+      if (event.detail?.error) {
+        setErrorMessage(getErrorMessage(event.detail.error));
+      }
+    };
+
+    window.addEventListener('supabase.auth.error', handleAuthError as EventListener);
+
+    return () => {
+      subscription.unsubscribe();
+      window.removeEventListener('supabase.auth.error', handleAuthError as EventListener);
+    };
   }, [navigate]);
 
   const getErrorMessage = (error: AuthError) => {
