@@ -47,19 +47,20 @@ const Auth = () => {
       if (event.detail?.error) {
         const error = event.detail.error;
         try {
-          // If the error is a string (JSON), parse it
           if (typeof error === 'string') {
             const parsedError = JSON.parse(error);
-            setErrorMessage(getErrorMessage({ 
-              message: parsedError.message,
-              status: parsedError.status || 400,
-              name: 'AuthApiError'
-            } as AuthError));
-          } else {
-            setErrorMessage(getErrorMessage(error));
+            if (parsedError.status === 400 || parsedError.code === 'invalid_credentials') {
+              setErrorMessage("Incorrect email or password. Please try again.");
+              return;
+            }
           }
+          setErrorMessage(getErrorMessage(error));
         } catch (e) {
-          // If parsing fails, use the error directly
+          // If parsing fails, check if it's a 400 error
+          if (error.status === 400 || error.code === 'invalid_credentials') {
+            setErrorMessage("Incorrect email or password. Please try again.");
+            return;
+          }
           setErrorMessage(getErrorMessage(error));
         }
       }
@@ -77,16 +78,7 @@ const Auth = () => {
     if (error instanceof AuthApiError) {
       switch (error.status) {
         case 400:
-          if (error.message.includes("Invalid login credentials")) {
-            return "Incorrect email or password. Please try again.";
-          }
-          if (error.message.includes("already registered")) {
-            return "This email is already registered. Please try signing in instead.";
-          }
-          if (error.message.includes("password")) {
-            return "Password must be at least 10 characters long and include uppercase, lowercase, and special characters.";
-          }
-          return error.message;
+          return "Incorrect email or password. Please try again.";
         case 401:
           return "Incorrect email or password. Please try again.";
         case 422:
