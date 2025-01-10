@@ -36,12 +36,22 @@ const Admin = () => {
         return;
       }
 
-      const { data: users } = await supabase
+      // Get both auth users and their profile data
+      const { data: authUsers } = await supabase.auth.admin.listUsers();
+      const { data: profiles } = await supabase
         .from("profiles")
-        .select("*")
-        .order("created_at", { ascending: false });
+        .select("*");
 
-      setUsers(users || []);
+      // Combine auth users and profiles data
+      const combinedUsers = authUsers?.users.map(authUser => {
+        const profile = profiles?.find(p => p.id === authUser.id);
+        return {
+          ...profile,
+          last_sign_in: authUser.last_sign_in_at,
+        };
+      }) || [];
+
+      setUsers(combinedUsers);
       setLoading(false);
     };
 
@@ -68,6 +78,7 @@ const Admin = () => {
                   <TableHead>Role</TableHead>
                   <TableHead>Email Verified</TableHead>
                   <TableHead>Created At</TableHead>
+                  <TableHead>Last Login</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -78,6 +89,11 @@ const Admin = () => {
                     <TableCell>{user.email_verified ? "Yes" : "No"}</TableCell>
                     <TableCell>
                       {new Date(user.created_at).toLocaleDateString()}
+                    </TableCell>
+                    <TableCell>
+                      {user.last_sign_in 
+                        ? new Date(user.last_sign_in).toLocaleString()
+                        : "Never"}
                     </TableCell>
                   </TableRow>
                 ))}
