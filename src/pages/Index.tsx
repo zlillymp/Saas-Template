@@ -28,13 +28,30 @@ const Index = () => {
 
   const handleSignOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
+      // First check if we have a session
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      if (!currentSession) {
+        // If no session, just clear the local state
+        setSession(null);
+        return;
+      }
+
+      // Proceed with sign out
+      const { error } = await supabase.auth.signOut({
+        scope: 'local' // Only clear the current tab's session
+      });
+
       if (error) {
+        console.error("Sign out error:", error);
         toast({
           variant: "destructive",
           title: "Error signing out",
           description: error.message,
         });
+      } else {
+        // Clear local session state
+        setSession(null);
       }
     } catch (error) {
       console.error("Error signing out:", error);
