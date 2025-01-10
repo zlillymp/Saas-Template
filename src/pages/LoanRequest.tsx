@@ -1,3 +1,4 @@
+import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -149,7 +150,7 @@ const LoanRequest = () => {
   });
 
   // Update initial_rate when wsj_prime or spread changes
-  React.useEffect(() => {
+  useEffect(() => {
     const newInitialRate = Number(wsj_prime || 0) + Number(spread || 0);
     form.setValue("initial_rate", newInitialRate);
     
