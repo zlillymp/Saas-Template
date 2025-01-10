@@ -1,75 +1,13 @@
-import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import {
   NavigationMenu,
   NavigationMenuList,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
-import { Button } from "@/components/ui/button";
-import { Session } from "@supabase/supabase-js";
+import { useAuthSession } from "./auth/useAuthSession";
+import { SignOutButton } from "./auth/SignOutButton";
+import { NavigationItems } from "./navigation/NavigationItems";
 
 const NavHeader = () => {
-  const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [session, setSession] = useState<Session | null>(null);
-
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      if (session?.user) {
-        getProfile(session.user.id);
-      }
-    });
-
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      if (session?.user) {
-        getProfile(session.user.id);
-      } else {
-        setIsAdmin(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const getProfile = async (userId: string) => {
-    try {
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", userId)
-        .single();
-
-      if (error) {
-        console.error("Error fetching profile:", error);
-        return;
-      }
-
-      setIsAdmin(profile?.role === "admin");
-    } catch (error) {
-      console.error("Error in getProfile:", error);
-    }
-  };
-
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut({
-        scope: 'local'
-      });
-      if (error) throw error;
-      navigate("/");
-    } catch (error) {
-      console.error("Error signing out:", error);
-    }
-  };
+  const { session, isAdmin } = useAuthSession();
 
   // Only render navigation items if user is authenticated
   if (!session) {
@@ -81,28 +19,10 @@ const NavHeader = () => {
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <NavigationMenu>
           <NavigationMenuList>
-            <NavigationMenuItem>
-              <Link to="/account" className={navigationMenuTriggerStyle()}>
-                Dashboard
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <Link to="/deals" className={navigationMenuTriggerStyle()}>
-                Deals
-              </Link>
-            </NavigationMenuItem>
-            {isAdmin && (
-              <NavigationMenuItem>
-                <Link to="/admin" className={navigationMenuTriggerStyle()}>
-                  Admin
-                </Link>
-              </NavigationMenuItem>
-            )}
+            <NavigationItems isAdmin={isAdmin} />
           </NavigationMenuList>
         </NavigationMenu>
-        <Button variant="outline" onClick={handleSignOut}>
-          Sign Out
-        </Button>
+        <SignOutButton />
       </div>
     </div>
   );

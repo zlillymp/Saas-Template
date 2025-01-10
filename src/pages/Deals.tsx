@@ -44,9 +44,16 @@ const Deals = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("No authenticated user found");
+      }
+
       const { error } = await supabase.from("deals").insert({
         borrower_name: borrowerName,
         loan_amount: parseFloat(loanAmount),
+        user_id: user.id
       });
 
       if (error) throw error;
