@@ -41,13 +41,22 @@ const NavHeader = () => {
   }, []);
 
   const getProfile = async (userId: string) => {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", userId)
-      .single();
+    try {
+      const { data: profile, error } = await supabase
+        .from("profiles")
+        .select("user_role")
+        .eq("id", userId)
+        .single();
 
-    setIsAdmin(profile?.role === "admin");
+      if (error) {
+        console.error("Error fetching profile:", error);
+        return;
+      }
+
+      setIsAdmin(profile?.user_role === "admin");
+    } catch (error) {
+      console.error("Error in getProfile:", error);
+    }
   };
 
   const handleSignOut = async () => {
