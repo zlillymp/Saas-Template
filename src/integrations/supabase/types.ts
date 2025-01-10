@@ -72,6 +72,96 @@ export type Database = {
         }
         Relationships: []
       }
+      debt: {
+        Row: {
+          created_at: string
+          deal_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deal_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deal_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debt_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      financials: {
+        Row: {
+          created_at: string
+          deal_id: string
+          id: string
+          type: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deal_id: string
+          id?: string
+          type: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deal_id?: string
+          id?: string
+          type?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financials_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      loan_requests: {
+        Row: {
+          created_at: string
+          deal_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deal_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deal_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "loan_requests_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -98,6 +188,35 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      use_of_proceeds: {
+        Row: {
+          created_at: string
+          deal_id: string
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          deal_id: string
+          id?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          deal_id?: string
+          id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "use_of_proceeds_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
