@@ -100,14 +100,24 @@ const Auth = () => {
             }}
             providers={[]}
             redirectTo={window.location.origin}
-            onError={(error) => {
-              setErrorMessage(getErrorMessage(error));
-            }}
             localization={{
               variables: {
                 sign_up: {
                   password_label: "Password (min. 10 characters, including uppercase, lowercase, and special characters)",
                   password_input_placeholder: "••••••••••",
+                  email_input_placeholder: "you@example.com",
+                  button_label: "Sign up",
+                  loading_button_label: "Signing up ...",
+                  social_provider_text: "Sign in with {{provider}}",
+                  link_text: "Don't have an account? Sign up",
+                },
+                sign_in: {
+                  password_label: "Your password",
+                  email_input_placeholder: "you@example.com",
+                  button_label: "Sign in",
+                  loading_button_label: "Signing in ...",
+                  social_provider_text: "Sign in with {{provider}}",
+                  link_text: "Already have an account? Sign in",
                 },
               },
             }}
