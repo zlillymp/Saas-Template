@@ -8,6 +8,7 @@ import Auth from "./pages/Auth";
 import Account from "./pages/Account";
 import Admin from "./pages/Admin";
 import Deals from "./pages/Deals";
+import LoanRequest from "./pages/LoanRequest";
 
 const queryClient = new QueryClient();
 
@@ -23,6 +24,7 @@ const App = () => (
           <Route path="/account" element={<Account />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="/deals" element={<Deals />} />
+          <Route path="/deals/:dealId/loan-request" element={<LoanRequest />} />
         </Routes>
       </BrowserRouter>
     </TooltipProvider>

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from "react-router-dom";
 import NavHeader from "@/components/NavHeader";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const Deals = () => {
+  const navigate = useNavigate();
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [borrowerName, setBorrowerName] = useState("");
@@ -63,7 +65,6 @@ const Deals = () => {
         description: "Deal created successfully",
       });
 
-      // Reset form and close dialog
       setBorrowerName("");
       setLoanAmount("");
       setIsOpen(false);
@@ -130,6 +131,7 @@ const Deals = () => {
                 <TableHead>Loan Amount</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Created At</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -142,6 +144,14 @@ const Deals = () => {
                   <TableCell className="capitalize">{deal.status}</TableCell>
                   <TableCell>
                     {new Date(deal.created_at).toLocaleDateString()}
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      variant="outline"
+                      onClick={() => navigate(`/deals/${deal.id}/loan-request`)}
+                    >
+                      Loan Request
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}

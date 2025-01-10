@@ -135,22 +135,58 @@ export type Database = {
       }
       loan_requests: {
         Row: {
+          collateral_coverage: number | null
           created_at: string
           deal_id: string
           id: string
+          initial_rate: number | null
+          interest_only: boolean | null
+          loan_purpose: Database["public"]["Enums"]["loan_purpose_type"] | null
+          ltv: number | null
+          monthly_payment: number | null
+          property_type:
+            | Database["public"]["Enums"]["property_type_enum"]
+            | null
+          spread: number | null
+          term: number | null
           updated_at: string
+          wsj_prime: number | null
         }
         Insert: {
+          collateral_coverage?: number | null
           created_at?: string
           deal_id: string
           id?: string
+          initial_rate?: number | null
+          interest_only?: boolean | null
+          loan_purpose?: Database["public"]["Enums"]["loan_purpose_type"] | null
+          ltv?: number | null
+          monthly_payment?: number | null
+          property_type?:
+            | Database["public"]["Enums"]["property_type_enum"]
+            | null
+          spread?: number | null
+          term?: number | null
           updated_at?: string
+          wsj_prime?: number | null
         }
         Update: {
+          collateral_coverage?: number | null
           created_at?: string
           deal_id?: string
           id?: string
+          initial_rate?: number | null
+          interest_only?: boolean | null
+          loan_purpose?: Database["public"]["Enums"]["loan_purpose_type"] | null
+          ltv?: number | null
+          monthly_payment?: number | null
+          property_type?:
+            | Database["public"]["Enums"]["property_type_enum"]
+            | null
+          spread?: number | null
+          term?: number | null
           updated_at?: string
+          wsj_prime?: number | null
         }
         Relationships: [
           {
@@ -235,6 +271,24 @@ export type Database = {
     }
     Enums: {
       deal_status: "active" | "closed" | "cancelled"
+      loan_purpose_type:
+        | "Purchase"
+        | "Purchase based upon Projections"
+        | "Special Purpose Purchase based upon Projections"
+        | "Rate and Term Refinance"
+        | "R/T Refinance – Projections"
+        | "Special Purpose R/T Refinance"
+        | "Spec. Purp. R/T Refi – Projections"
+        | "Cash-out Refinance"
+        | "Cash-out Refi – Projections"
+        | "Limited Cash-out Refinance"
+        | "Limited Cash-out Refi – Projections"
+        | "Refi Partner Buyout"
+        | "Refi Partner Buyout – Projections"
+        | "Delayed Purchase"
+        | "Delayed Purchase – Projections"
+        | "Second Trust Deed"
+      property_type_enum: "Multi-purpose" | "Special purpose"
       user_role: "admin" | "user"
     }
     CompositeTypes: {
