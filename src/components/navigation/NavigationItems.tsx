@@ -10,8 +10,6 @@ interface NavigationItemsProps {
 }
 
 export const NavigationItems = ({ isAdmin }: NavigationItemsProps) => {
-  console.log("NavigationItems isAdmin:", isAdmin);
-  
   return (
     <>
       <NavigationMenuItem>
@@ -24,13 +22,11 @@ export const NavigationItems = ({ isAdmin }: NavigationItemsProps) => {
           Deals
         </Link>
       </NavigationMenuItem>
-      {isAdmin && (
-        <NavigationMenuItem>
-          <Link to="/admin" className={navigationMenuTriggerStyle()}>
-            Admin
-          </Link>
-        </NavigationMenuItem>
-      )}
+      <NavigationMenuItem>
+        <Link to="/admin" className={navigationMenuTriggerStyle()}>
+          Admin
+        </Link>
+      </NavigationMenuItem>
     </>
   );
 };
