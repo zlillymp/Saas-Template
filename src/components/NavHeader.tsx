@@ -44,7 +44,7 @@ const NavHeader = () => {
     try {
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("user_role")
+        .select("role")  // Changed from user_role to role
         .eq("id", userId)
         .single();
 
@@ -53,7 +53,7 @@ const NavHeader = () => {
         return;
       }
 
-      setIsAdmin(profile?.user_role === "admin");
+      setIsAdmin(profile?.role === "admin");  // Changed from user_role to role
     } catch (error) {
       console.error("Error in getProfile:", error);
     }
