@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import NavHeader from "@/components/NavHeader";
 
 const Account = () => {
   const navigate = useNavigate();
@@ -30,41 +31,36 @@ const Account = () => {
     getUser();
   }, [navigate]);
 
-  const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
-  };
-
   if (loading) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
   return (
-    <div className="container mx-auto py-8 px-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Account Settings</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm font-medium">Email</label>
-            <p className="text-muted-foreground">{user?.email}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium">Role</label>
-            <p className="text-muted-foreground capitalize">{user?.role}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium">Email Verification</label>
-            <p className="text-muted-foreground">
-              {user?.email_verified ? "Verified" : "Not verified"}
-            </p>
-          </div>
-          <Button variant="destructive" onClick={handleSignOut}>
-            Sign Out
-          </Button>
-        </CardContent>
-      </Card>
+    <div>
+      <NavHeader />
+      <div className="container mx-auto py-8 px-4">
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Settings</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div>
+              <label className="text-sm font-medium">Email</label>
+              <p className="text-muted-foreground">{user?.email}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Role</label>
+              <p className="text-muted-foreground capitalize">{user?.role}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Email Verification</label>
+              <p className="text-muted-foreground">
+                {user?.email_verified ? "Verified" : "Not verified"}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };
