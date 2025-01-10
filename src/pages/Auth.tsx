@@ -56,6 +56,11 @@ const Auth = () => {
             return "Password must be at least 10 characters long and include uppercase, lowercase, and special characters.";
           }
           return error.message;
+        case 422:
+          if (error.message.includes("already registered") || error.message.includes("already exists")) {
+            return "This email is already registered. Please try signing in instead.";
+          }
+          return error.message;
         default:
           return "An error occurred during authentication. Please try again.";
       }
@@ -95,6 +100,9 @@ const Auth = () => {
             }}
             providers={[]}
             redirectTo={window.location.origin}
+            onError={(error) => {
+              setErrorMessage(getErrorMessage(error));
+            }}
             localization={{
               variables: {
                 sign_up: {
