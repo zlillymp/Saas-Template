@@ -45,7 +45,23 @@ const Auth = () => {
     // Listen for auth errors from Supabase Auth UI
     const handleAuthError = (event: CustomEvent) => {
       if (event.detail?.error) {
-        setErrorMessage(getErrorMessage(event.detail.error));
+        const error = event.detail.error;
+        try {
+          // If the error is a string (JSON), parse it
+          if (typeof error === 'string') {
+            const parsedError = JSON.parse(error);
+            setErrorMessage(getErrorMessage({ 
+              message: parsedError.message,
+              status: parsedError.status || 400,
+              name: 'AuthApiError'
+            } as AuthError));
+          } else {
+            setErrorMessage(getErrorMessage(error));
+          }
+        } catch (e) {
+          // If parsing fails, use the error directly
+          setErrorMessage(getErrorMessage(error));
+        }
       }
     };
 
@@ -82,7 +98,7 @@ const Auth = () => {
           return "An error occurred during authentication. Please try again.";
       }
     }
-    return error.message;
+    return error.message || "An unexpected error occurred. Please try again.";
   };
 
   return (
