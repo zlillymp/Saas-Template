@@ -2,18 +2,49 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Session } from "@supabase/supabase-js";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
+  const { toast } = useToast();
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUser(session?.user || null);
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
     });
 
     return () => subscription.unsubscribe();
   }, []);
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        toast({
+          variant: "destructive",
+          title: "Error signing out",
+          description: error.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast({
+        variant: "destructive",
+        title: "Error signing out",
+        description: "An unexpected error occurred while signing out.",
+      });
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-muted">
@@ -21,8 +52,13 @@ const Index = () => {
         <nav className="flex justify-between items-center py-6">
           <h1 className="text-2xl font-bold">SaaS Template</h1>
           <div className="space-x-4">
-            {user ? (
-              <Button onClick={() => navigate("/account")}>My Account</Button>
+            {session ? (
+              <div className="space-x-4">
+                <Button onClick={() => navigate("/account")}>My Account</Button>
+                <Button variant="outline" onClick={handleSignOut}>
+                  Sign Out
+                </Button>
+              </div>
             ) : (
               <Button onClick={() => navigate("/auth")}>Sign In</Button>
             )}
@@ -37,7 +73,7 @@ const Index = () => {
             <p className="text-xl text-muted-foreground">
               A secure, scalable solution for your business needs
             </p>
-            {!user && (
+            {!session && (
               <div className="space-x-4">
                 <Button size="lg" onClick={() => navigate("/auth")}>
                   Get Started
