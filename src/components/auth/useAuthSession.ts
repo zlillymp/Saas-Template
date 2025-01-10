@@ -19,7 +19,7 @@ export const useAuthSession = () => {
       }
     });
 
-    // Listen for auth changes
+    // Listen for changes in auth state
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {

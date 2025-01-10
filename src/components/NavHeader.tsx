@@ -1,9 +1,6 @@
-import {
-  NavigationMenu,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu";
-import { useAuthSession } from "./auth/useAuthSession";
-import { SignOutButton } from "./auth/SignOutButton";
+import { NavigationMenu } from "@/components/ui/navigation-menu";
+import { SignOutButton } from "@/components/auth/SignOutButton";
+import { useAuthSession } from "@/components/auth/useAuthSession";
 import { NavigationItems } from "./navigation/NavigationItems";
 
 const NavHeader = () => {
@@ -16,13 +13,13 @@ const NavHeader = () => {
 
   return (
     <div className="border-b">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
+      <div className="flex h-16 items-center px-4 container mx-auto">
         <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationItems isAdmin={isAdmin} />
-          </NavigationMenuList>
+          <NavigationItems isAdmin={isAdmin} />
         </NavigationMenu>
-        <SignOutButton />
+        <div className="ml-auto flex items-center space-x-4">
+          <SignOutButton />
+        </div>
       </div>
     </div>
   );
