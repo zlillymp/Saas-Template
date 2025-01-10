@@ -49,6 +49,9 @@ const Auth = () => {
     if (error instanceof AuthApiError) {
       switch (error.status) {
         case 400:
+          if (error.message.includes("Invalid login credentials")) {
+            return "Incorrect email or password. Please try again.";
+          }
           if (error.message.includes("already registered")) {
             return "This email is already registered. Please try signing in instead.";
           }
@@ -56,6 +59,8 @@ const Auth = () => {
             return "Password must be at least 10 characters long and include uppercase, lowercase, and special characters.";
           }
           return error.message;
+        case 401:
+          return "Incorrect email or password. Please try again.";
         case 422:
           if (error.message.includes("already registered") || error.message.includes("already exists")) {
             return "This email is already registered. Please try signing in instead.";
