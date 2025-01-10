@@ -9,6 +9,7 @@ export const useAuthSession = () => {
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Initial session:", session);
       setSession(session);
       if (session?.user) {
         getProfile(session.user.id);
@@ -19,6 +20,7 @@ export const useAuthSession = () => {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      console.log("Auth state changed:", session);
       setSession(session);
       if (session?.user) {
         getProfile(session.user.id);
@@ -43,7 +45,9 @@ export const useAuthSession = () => {
         return;
       }
 
+      console.log("Profile data:", profile);
       setIsAdmin(profile?.role === "admin");
+      console.log("Is admin?", profile?.role === "admin");
     } catch (error) {
       console.error("Error in getProfile:", error);
     }

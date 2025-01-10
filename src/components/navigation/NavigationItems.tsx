@@ -10,6 +10,8 @@ interface NavigationItemsProps {
 }
 
 export const NavigationItems = ({ isAdmin }: NavigationItemsProps) => {
+  console.log("NavigationItems isAdmin:", isAdmin);
+  
   return (
     <>
       <NavigationMenuItem>
