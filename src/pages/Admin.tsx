@@ -23,7 +23,9 @@ const Admin = () => {
     const checkAdminAndLoadUsers = async () => {
       try {
         // First check if user is logged in
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        if (authError) throw authError;
+        
         if (!user) {
           navigate("/auth");
           return;
@@ -36,7 +38,9 @@ const Admin = () => {
           .eq("id", user.id)
           .single();
 
-        if (profileError || profile?.role !== "admin") {
+        if (profileError) throw profileError;
+
+        if (profile?.role !== "admin") {
           toast({
             title: "Access Denied",
             description: "You must be an admin to view this page.",
@@ -46,25 +50,34 @@ const Admin = () => {
           return;
         }
 
-        // If user is admin, fetch all profiles
+        // If user is admin, fetch all profiles with proper error handling
         const { data: profiles, error: profilesError } = await supabase
           .from("profiles")
           .select("*")
           .order("created_at", { ascending: false });
 
-        if (profilesError) {
-          throw profilesError;
+        if (profilesError) throw profilesError;
+
+        console.log("Fetched profiles:", profiles);
+        
+        if (!profiles || profiles.length === 0) {
+          toast({
+            title: "No Users Found",
+            description: "There are currently no registered users in the system.",
+          });
         }
 
-        console.log("Fetched profiles:", profiles); // Debug log
         setUsers(profiles || []);
-      } catch (error) {
-        console.error("Error loading users:", error);
+      } catch (error: any) {
+        console.error("Error in admin page:", error);
         toast({
           title: "Error",
-          description: "Failed to load users. Please try again.",
+          description: error.message || "Failed to load users. Please try again.",
           variant: "destructive",
         });
+        if (error.message?.includes("auth")) {
+          navigate("/auth");
+        }
       } finally {
         setLoading(false);
       }
@@ -74,7 +87,11 @@ const Admin = () => {
   }, [navigate, toast]);
 
   if (loading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
   }
 
   return (
