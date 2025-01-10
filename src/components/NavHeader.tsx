@@ -9,35 +9,63 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import { Button } from "@/components/ui/button";
+import { Session } from "@supabase/supabase-js";
 
 const NavHeader = () => {
   const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [session, setSession] = useState<Session | null>(null);
 
   useEffect(() => {
-    const getProfile = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        navigate("/auth");
-        return;
+    // Get initial session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      if (session?.user) {
+        getProfile(session.user.id);
       }
+    });
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
+    // Listen for auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+      if (session?.user) {
+        getProfile(session.user.id);
+      } else {
+        setIsAdmin(false);
+      }
+    });
 
-      setIsAdmin(profile?.role === "admin");
-    };
+    return () => subscription.unsubscribe();
+  }, []);
 
-    getProfile();
-  }, [navigate]);
+  const getProfile = async (userId: string) => {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .single();
+
+    setIsAdmin(profile?.role === "admin");
+  };
 
   const handleSignOut = async () => {
-    await supabase.auth.signOut();
-    navigate("/");
+    try {
+      const { error } = await supabase.auth.signOut({
+        scope: 'local'
+      });
+      if (error) throw error;
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
   };
+
+  // Only render navigation items if user is authenticated
+  if (!session) {
+    return null;
+  }
 
   return (
     <div className="border-b">
