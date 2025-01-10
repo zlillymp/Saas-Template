@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 export const useAuthSession = () => {
   const [session, setSession] = useState<Session | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     // Get initial session
@@ -13,6 +14,8 @@ export const useAuthSession = () => {
       setSession(session);
       if (session?.user) {
         getProfile(session.user.id);
+      } else {
+        setIsLoading(false);
       }
     });
 
@@ -26,6 +29,7 @@ export const useAuthSession = () => {
         getProfile(session.user.id);
       } else {
         setIsAdmin(false);
+        setIsLoading(false);
       }
     });
 
@@ -34,6 +38,7 @@ export const useAuthSession = () => {
 
   const getProfile = async (userId: string) => {
     try {
+      // First try to get own profile
       const { data: profile, error } = await supabase
         .from("profiles")
         .select("role")
@@ -42,16 +47,19 @@ export const useAuthSession = () => {
 
       if (error) {
         console.error("Error fetching profile:", error);
+        setIsLoading(false);
         return;
       }
 
       console.log("Profile data:", profile);
-      setIsAdmin(profile?.role === "admin");
-      console.log("Is admin?", profile?.role === "admin");
+      setIsAdmin(profile?.role === 'admin');
+      console.log("Is admin?", profile?.role === 'admin');
     } catch (error) {
       console.error("Error in getProfile:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return { session, isAdmin };
+  return { session, isAdmin, isLoading };
 };

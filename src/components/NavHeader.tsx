@@ -7,10 +7,10 @@ import { SignOutButton } from "./auth/SignOutButton";
 import { NavigationItems } from "./navigation/NavigationItems";
 
 const NavHeader = () => {
-  const { session, isAdmin } = useAuthSession();
+  const { session, isAdmin, isLoading } = useAuthSession();
 
-  // Only render navigation items if user is authenticated
-  if (!session) {
+  // Only render navigation items if user is authenticated and loading is complete
+  if (!session || isLoading) {
     return null;
   }
 
