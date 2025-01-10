@@ -42,6 +42,36 @@ export type Database = {
         }
         Relationships: []
       }
+      deals: {
+        Row: {
+          borrower_name: string
+          created_at: string
+          id: string
+          loan_amount: number
+          status: Database["public"]["Enums"]["deal_status"] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          borrower_name: string
+          created_at?: string
+          id?: string
+          loan_amount: number
+          status?: Database["public"]["Enums"]["deal_status"] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          borrower_name?: string
+          created_at?: string
+          id?: string
+          loan_amount?: number
+          status?: Database["public"]["Enums"]["deal_status"] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -85,6 +115,7 @@ export type Database = {
       }
     }
     Enums: {
+      deal_status: "active" | "closed" | "cancelled"
       user_role: "admin" | "user"
     }
     CompositeTypes: {

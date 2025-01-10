@@ -44,7 +44,7 @@ const NavHeader = () => {
     try {
       const { data: profile, error } = await supabase
         .from("profiles")
-        .select("role")  // Changed from user_role to role
+        .select("role")
         .eq("id", userId)
         .single();
 
@@ -53,7 +53,7 @@ const NavHeader = () => {
         return;
       }
 
-      setIsAdmin(profile?.role === "admin");  // Changed from user_role to role
+      setIsAdmin(profile?.role === "admin");
     } catch (error) {
       console.error("Error in getProfile:", error);
     }
@@ -84,6 +84,11 @@ const NavHeader = () => {
             <NavigationMenuItem>
               <Link to="/account" className={navigationMenuTriggerStyle()}>
                 Dashboard
+              </Link>
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <Link to="/deals" className={navigationMenuTriggerStyle()}>
+                Deals
               </Link>
             </NavigationMenuItem>
             {isAdmin && (
