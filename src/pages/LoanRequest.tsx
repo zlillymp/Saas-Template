@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import NavHeader from "@/components/NavHeader";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import * as z from "zod";
 import { ChevronLeft } from "lucide-react";
 
@@ -67,6 +67,7 @@ const LoanRequest = () => {
   const { dealId } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: deal } = useQuery({
     queryKey: ["deal", dealId],
@@ -96,6 +97,30 @@ const LoanRequest = () => {
     },
   });
 
+  const updateLoanRequest = useMutation({
+    mutationFn: async (values: z.infer<typeof formSchema>) => {
+      const { error } = await supabase
+        .from("loan_requests")
+        .upsert({
+          deal_id: dealId,
+          ...values,
+        });
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["loan_request", dealId] });
+    },
+    onError: (error) => {
+      console.error("Error saving loan request:", error);
+      toast({
+        title: "Error",
+        description: "Failed to save loan request",
+        variant: "destructive",
+      });
+    },
+  });
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -112,28 +137,36 @@ const LoanRequest = () => {
     },
   });
 
+  // Watch wsj_prime and spread for automatic calculations
+  const wsj_prime = useWatch({
+    control: form.control,
+    name: "wsj_prime",
+  });
+
+  const spread = useWatch({
+    control: form.control,
+    name: "spread",
+  });
+
+  // Update initial_rate when wsj_prime or spread changes
+  React.useEffect(() => {
+    const newInitialRate = Number(wsj_prime || 0) + Number(spread || 0);
+    form.setValue("initial_rate", newInitialRate);
+    
+    // Save to database whenever values change
+    const values = form.getValues();
+    updateLoanRequest.mutate(values);
+  }, [wsj_prime, spread]);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { error } = await supabase
-        .from("loan_requests")
-        .upsert({
-          deal_id: dealId,
-          ...values,
-        });
-
-      if (error) throw error;
-
+      await updateLoanRequest.mutateAsync(values);
       toast({
         title: "Success",
         description: "Loan request saved successfully",
       });
     } catch (error) {
       console.error("Error saving loan request:", error);
-      toast({
-        title: "Error",
-        description: "Failed to save loan request",
-        variant: "destructive",
-      });
     }
   };
 
